@@ -31,7 +31,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const jwt = new google.auth.JWT(email, null, key, ['https://www.googleapis.com/auth/drive'])
+    const jwt = new google.auth.JWT({ email, key, scopes: ['https://www.googleapis.com/auth/drive'] })
     const tokens = await jwt.authorize()
     report.auth = { ok: true, gotAccessToken: !!(tokens && tokens.access_token) }
     try {

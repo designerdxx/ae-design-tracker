@@ -30,7 +30,9 @@ export function missingEnv() {
 let _drive
 function drive() {
   if (_drive) return _drive
-  const auth = new google.auth.JWT(CLIENT_EMAIL, null, PRIVATE_KEY, SCOPES)
+  // google-auth-library v10 requires the options-object form; the older positional
+  // JWT(email, null, key, scopes) signature throws "No key or keyFile set."
+  const auth = new google.auth.JWT({ email: CLIENT_EMAIL, key: PRIVATE_KEY, scopes: SCOPES })
   _drive = google.drive({ version: 'v3', auth })
   return _drive
 }
