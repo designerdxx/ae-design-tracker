@@ -234,7 +234,7 @@ export default function App() {
           ? <Roadmap roadmap={snap && snap.roadmap} weekFocus={meta.weekFocus} projectedFinish={meta.projectedFinish} status={meta.status} dateLabel={day && day.dateLabel} />
           : dailyCard}
       </div>
-      {view === 'daily' && <ComboMeter streak={streak} pulse={streakPulse} progress={total ? doneCount / total : 0} />}
+      {view === 'daily' && <ComboMeter streak={streak} pulse={streakPulse} />}
     </div>
   )
 }
