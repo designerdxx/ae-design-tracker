@@ -18,6 +18,24 @@ export const viewStore = {
   set: v => ls.set(VIEW, v),
 }
 
+// --- Daily streak (client-side gamification, persisted locally) ---
+// A set of fully-completed day strings; the streak is the run of consecutive
+// calendar days ending at the most recent completed day.
+const COMPLETED_DAYS = 'askedgar:streak:days'
+export function loadCompletedDays() { return ls.get(COMPLETED_DAYS, {}) }
+export function saveCompletedDays(set) { ls.set(COMPLETED_DAYS, set) }
+const toUTC = d => { const [y, m, day] = d.split('-').map(Number); return Date.UTC(y, m - 1, day) }
+export function computeStreak(set) {
+  const days = Object.keys(set || {}).filter(d => set[d]).sort()
+  if (!days.length) return 0
+  let streak = 1
+  let cur = days[days.length - 1]
+  for (let i = days.length - 2; i >= 0; i--) {
+    if (Math.round((toUTC(cur) - toUTC(days[i])) / 86400000) === 1) { streak++; cur = days[i] } else break
+  }
+  return streak
+}
+
 // Instant snapshot from cache (by date, or the most recently cached day).
 export function cachedState(date) {
   const d = date || ls.get(LATEST, null)

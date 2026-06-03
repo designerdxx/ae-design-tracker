@@ -1,7 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Roadmap from './Roadmap.jsx'
 import Confetti from './Confetti.jsx'
-import { api, cachedState, cacheSnap, fetchState, seedState, viewStore } from './api.js'
+import ComboMeter from './ComboMeter.jsx'
+import {
+  api, cachedState, cacheSnap, fetchState, seedState, viewStore,
+  loadCompletedDays, saveCompletedDays, computeStreak,
+} from './api.js'
 
 const shortLabel = (date) => {
   try { return new Date(date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) }
@@ -35,6 +39,9 @@ export default function App() {
   const [savedFlash, setSavedFlash] = useState(false)
   const [confettiKey, setConfettiKey] = useState(0)
   const [removing, setRemoving] = useState(() => new Set())
+  const [streak, setStreak] = useState(() => computeStreak(loadCompletedDays()))
+  const [streakPulse, setStreakPulse] = useState(0)
+  const streakRef = useRef(streak)
 
   // Navigate to a day: show the cached copy instantly, then refresh from Drive. If the
   // network (or the dev server, which has no /api) fails, fall back to a local seed.
@@ -89,6 +96,16 @@ export default function App() {
     const nowAll = total > 0 && tasks.every(t => nextDone[`${t.list}-${t.id}`])
     setSnap(next); cacheSnap(next)
     if (nowAll && !wasAll) setConfettiKey(k => k + 1)
+    // Streak: record/cancel this day's completion and pop the meter when it grows.
+    if (nowAll !== wasAll) {
+      const set = loadCompletedDays()
+      if (nowAll) set[date] = true; else delete set[date]
+      saveCompletedDays(set)
+      const ns = computeStreak(set)
+      if (ns > streakRef.current) setStreakPulse(p => p + 1)
+      streakRef.current = ns
+      setStreak(ns)
+    }
     api.toggle(date, id, list, done).catch(() => {})
   }
 
@@ -164,6 +181,15 @@ export default function App() {
           : <div className="empty">Nothing was scheduled this day.</div>}
       </div>
 
+      {allDone && (
+        <div className="advance">
+          <span className="advance-tag">Day cleared</span>
+          {idx < dates.length - 1
+            ? <button className="advance-btn" onClick={() => goToDate(dates[idx + 1])}>Next day <span className="advance-arrow">→</span></button>
+            : <span className="advance-caught">All caught up — next brief drops soon</span>}
+        </div>
+      )}
+
       <div className="notes">
         <h2>Figma links &amp; notes</h2>
         {!ro && (
@@ -208,6 +234,7 @@ export default function App() {
           ? <Roadmap roadmap={snap && snap.roadmap} weekFocus={meta.weekFocus} projectedFinish={meta.projectedFinish} status={meta.status} dateLabel={day && day.dateLabel} />
           : dailyCard}
       </div>
+      {view === 'daily' && <ComboMeter streak={streak} pulse={streakPulse} progress={total ? doneCount / total : 0} />}
     </div>
   )
 }

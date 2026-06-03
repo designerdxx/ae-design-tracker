@@ -156,10 +156,41 @@ select:focus{outline:none;border-color:var(--accent);}
   8%{opacity:1;}
   100%{opacity:0;transform:translate(var(--drift),105vh) rotate(var(--rot));}
 }
+/* ===== "Day cleared → Next day" advance band ===== */
+.advance{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 20px;border-top:1px solid var(--border);background:var(--raised);animation:advance-in .3s var(--ease) both;}
+.advance-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--done);}
+.advance-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--done);}
+.advance-btn{font-family:var(--f);font-size:13px;font-weight:600;color:#fff;background:var(--accent);border:none;border-radius:var(--r-sm);padding:8px 13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:opacity .15s,transform .12s var(--ease);}
+.advance-btn:hover{opacity:.92;}
+.advance-btn:active{transform:scale(.97);}
+.advance-arrow{transition:transform .2s var(--ease);}
+.advance-btn:hover .advance-arrow{transform:translateX(3px);}
+.advance-caught{font-size:12px;color:var(--text-3);}
+@keyframes advance-in{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+
+/* ===== Combo meter (day streak, fighting-game HUD, bottom-right) ===== */
+.combo{position:fixed;z-index:40;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:flex-end;gap:5px;min-width:108px;padding:9px 13px 10px;--c:var(--accent);background:var(--raised);border:1px solid var(--border-strong);border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.45);pointer-events:none;animation:combo-in .34s var(--ease) both;transition:box-shadow .3s var(--ease);}
+.combo.combo-warm{--c:var(--running);}
+.combo.combo-hot{--c:color-mix(in oklab,var(--running),var(--risk));}
+.combo.combo-fire{--c:var(--risk);animation:combo-in .34s var(--ease) both,combo-blaze 1.5s ease-in-out infinite .34s;}
+.combo-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);}
+.combo-num{font-style:italic;font-weight:800;font-size:34px;line-height:.85;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--c);text-shadow:0 0 16px color-mix(in oklab,var(--c) 45%,transparent);animation:combo-pop .34s var(--ease);}
+.combo-x{font-size:17px;font-weight:700;opacity:.65;margin-right:1px;vertical-align:.2em;}
+.combo-charge{width:100%;height:4px;border-radius:999px;background:var(--progress-track);overflow:hidden;}
+.combo-charge>span{display:block;height:100%;background:var(--c);border-radius:999px;transition:width .4s var(--ease);}
+.combo-flair{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--c);opacity:.92;}
+@keyframes combo-in{from{opacity:0;transform:translateY(12px) scale(.85);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes combo-pop{0%{transform:scale(1);}32%{transform:scale(1.3);}100%{transform:scale(1);}}
+@keyframes combo-blaze{0%,100%{box-shadow:0 14px 34px rgba(0,0,0,.45),0 0 18px color-mix(in oklab,var(--risk) 28%,transparent);}50%{box-shadow:0 14px 34px rgba(0,0,0,.45),0 0 30px color-mix(in oklab,var(--risk) 55%,transparent);}}
+@media (max-width:560px){.combo{min-width:92px;padding:8px 11px 9px;}.combo-num{font-size:28px;}}
+
 @media (prefers-reduced-motion: reduce){
   .confetti{display:none;}
   .rm .node.active .dot .pulse{animation:none;}
   .box svg path{transition:none;stroke-dashoffset:0;}
   .view,.link,.link.removing{animation:none;}
   .switch-thumb{transition:none;}
+  .advance{animation:none;}
+  .advance-arrow,.combo-charge>span{transition:none;}
+  .combo,.combo-num,.combo.combo-fire{animation:none;}
 }
