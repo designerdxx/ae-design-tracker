@@ -75,6 +75,13 @@ export const api = {
   saveNotes: (date, note) => post('/api/notes', { date, note }),
 }
 
+// Promote the next working day server-side and return its (cached) view model.
+export async function nextDay() {
+  const data = await post('/api/next-day', {})
+  if (data && data.date) cacheSnap(data)
+  return data
+}
+
 // Dev / offline seed: the same shape /api/state returns, built from the embedded Phase 1
 // data so `vite dev` (no functions, no Drive) still renders the real design and is editable.
 export function seedState(date) {

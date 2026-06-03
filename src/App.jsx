@@ -3,7 +3,7 @@ import Roadmap from './Roadmap.jsx'
 import Confetti from './Confetti.jsx'
 import ComboMeter from './ComboMeter.jsx'
 import {
-  api, cachedState, cacheSnap, fetchState, seedState, viewStore,
+  api, nextDay, cachedState, cacheSnap, fetchState, seedState, viewStore,
   loadCompletedDays, saveCompletedDays, computeStreak,
 } from './api.js'
 
@@ -48,6 +48,7 @@ export default function App() {
   const [confettiKey, setConfettiKey] = useState(0)
   const [removing, setRemoving] = useState(() => new Set())
   const [addPressing, setAddPressing] = useState(false)
+  const [promoting, setPromoting] = useState(false)
   const [streak, setStreak] = useState(() => computeStreak(loadCompletedDays()))
   const [streakPulse, setStreakPulse] = useState(0)
   const streakRef = useRef(streak)
@@ -83,9 +84,6 @@ export default function App() {
   const latest = dates.length ? dates[dates.length - 1] : null
   const ro = !day || date !== latest
   const idx = dates.indexOf(date)
-  // The day to advance to when the current one is cleared. null on the newest day → goToDate(null)
-  // refetches the latest from the server, picking up a freshly-posted next brief if there is one.
-  const nextDate = idx >= 0 && idx < dates.length - 1 ? dates[idx + 1] : null
 
   const tasks = day
     ? [
@@ -164,6 +162,18 @@ export default function App() {
     clearTimeout(window.__nsv); window.__nsv = setTimeout(() => api.saveNotes(date, val).catch(() => {}), 500)
   }
 
+  // Promote the next working day server-side, then show it. Disabled while in flight.
+  const promoteNextDay = async () => {
+    if (promoting) return
+    setPromoting(true)
+    try {
+      const fresh = await nextDay()
+      if (fresh && fresh.date) { setSnap(fresh); setFigInput(''); setRemoving(new Set()) }
+      else await goToDate(null)
+    } catch { /* keep current day; the user can retry */ }
+    finally { setPromoting(false) }
+  }
+
   const meta = (snap && snap.meta) || {}
   const atRisk = (meta.status || '').toLowerCase().includes('risk')
 
@@ -192,10 +202,11 @@ export default function App() {
         <div className="count">
           {total === 0 ? 'No tasks' : allDone ? 'All done' : <><b>{doneCount}</b> of {total} done</>}
         </div>
-        {allDone && (
-          <button className="nextday-btn" onClick={() => goToDate(nextDate)}
-            title={nextDate ? 'Go to the next day' : 'Check for the next day'}>
-            Next day <span className="nextday-arrow" aria-hidden="true">→</span>
+        {!ro && (
+          <button className={'nextday-btn' + (!allDone && !promoting ? ' dim' : '')}
+            onClick={promoteNextDay} disabled={promoting}
+            title={promoting ? 'Promoting…' : allDone ? 'Promote the next day' : "Finish today's tasks first"}>
+            {promoting ? 'Promoting…' : <>Next day <span className="nextday-arrow" aria-hidden="true">→</span></>}
           </button>
         )}
       </div>
