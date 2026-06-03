@@ -61,8 +61,9 @@ select:focus{outline:none;border-color:var(--accent);}
 .section h2{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);font-weight:600;margin:12px 8px 4px;display:flex;align-items:center;gap:8px;}
 .section h2 .pill{font-size:10px;font-weight:600;padding:1px 7px;border-radius:999px;}
 .pill.carry{color:var(--risk);background:var(--risk-soft);}
-.item{display:flex;gap:12px;padding:12px 8px;border-radius:var(--r-sm);cursor:pointer;transition:background .15s;align-items:flex-start;}
+.item{display:flex;gap:12px;padding:12px 8px;border-radius:var(--r-sm);cursor:pointer;transition:background .15s,transform .14s var(--ease);align-items:flex-start;}
 .item:hover{background:var(--raised);}
+.card:not(.ro) .item:active{transform:scale(.98);transition-duration:.06s;}
 .ro .item{cursor:default;}
 .ro .item:hover{background:transparent;}
 .box{flex:none;width:20px;height:20px;border:1.5px solid var(--border-strong);border-radius:6px;margin-top:1px;display:grid;place-items:center;transition:background .18s var(--ease),border-color .18s var(--ease);background:var(--surface);}
@@ -85,9 +86,9 @@ select:focus{outline:none;border-color:var(--accent);}
 .figrow input{flex:1;min-width:0;font-family:var(--f);font-size:13px;font-weight:450;color:var(--text-1);border:1px solid var(--border-strong);border-radius:var(--r-sm);padding:9px 11px;background:var(--surface);}
 .figrow input::placeholder{color:var(--text-3);}
 .figrow input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
-.figrow button{flex:none;font-family:var(--f);font-size:13px;font-weight:550;color:#fff;background:var(--accent);border:none;border-radius:var(--r-sm);padding:0 14px;cursor:pointer;transition:opacity .15s,transform .12s var(--ease);}
+.figrow button{flex:none;font-family:var(--f);font-size:13px;font-weight:550;color:#fff;background:var(--accent);border:none;border-radius:var(--r-sm);padding:0 14px;cursor:pointer;transition:opacity .15s,transform .16s var(--ease);}
 .figrow button:hover{opacity:.9;}
-.figrow button:active{transform:scale(.96);}
+.figrow button:active{transform:scale(.9);transition-duration:.06s;}
 .links{display:flex;flex-direction:column;}
 .link{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 10px;font-size:13px;margin-bottom:6px;overflow:hidden;animation:link-in .22s var(--ease) both;}
 .link:last-child{margin-bottom:0;}
