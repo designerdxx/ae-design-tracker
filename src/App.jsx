@@ -83,6 +83,9 @@ export default function App() {
   const latest = dates.length ? dates[dates.length - 1] : null
   const ro = !day || date !== latest
   const idx = dates.indexOf(date)
+  // The day to advance to when the current one is cleared. null on the newest day → goToDate(null)
+  // refetches the latest from the server, picking up a freshly-posted next brief if there is one.
+  const nextDate = idx >= 0 && idx < dates.length - 1 ? dates[idx + 1] : null
 
   const tasks = day
     ? [
@@ -204,6 +207,15 @@ export default function App() {
           ? day.today_tasks.map(t => <Item key={t.id} listName="today" task={t} done={isDone(snap, { list: 'today', id: t.id })} readonly={ro} onToggle={onToggle} />)
           : <div className="empty">Nothing was scheduled this day.</div>}
       </div>
+
+      {allDone && (
+        <div className="nextday">
+          <button className="nextday-btn" onClick={() => goToDate(nextDate)}
+            title={nextDate ? 'Go to the next day' : 'Check for the next day'}>
+            Next day <span className="nextday-arrow" aria-hidden="true">→</span>
+          </button>
+        </div>
+      )}
 
       <div className="notes">
         <h2>Figma links &amp; notes</h2>

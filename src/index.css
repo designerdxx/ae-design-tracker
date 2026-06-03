@@ -81,6 +81,14 @@ select:focus{outline:none;border-color:var(--accent);}
 .item.done .txt .d{color:var(--text-3);}
 .txt .d b{font-weight:600;color:var(--text-2);}
 .empty{padding:14px 16px;font-size:13px;color:var(--text-3);}
+/* "Next day" — appears when the day is fully cleared */
+.nextday{display:flex;justify-content:flex-end;padding:4px 12px 14px;animation:nextday-in .28s var(--ease) both;}
+.nextday-btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--f);font-size:13px;font-weight:600;color:#fff;background:var(--accent);border:none;border-radius:var(--r-sm);padding:9px 15px;cursor:pointer;transition:opacity .15s,transform .12s var(--ease);}
+.nextday-btn:hover{opacity:.92;}
+.nextday-btn:active{transform:scale(.96);}
+.nextday-arrow{transition:transform .2s var(--ease);}
+.nextday-btn:hover .nextday-arrow{transform:translateX(3px);}
+@keyframes nextday-in{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
 .notes{border-top:1px solid var(--border);padding:16px 20px 18px;background:var(--raised);}
 .notes h2{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);font-weight:600;margin:0 0 8px;}
 .figrow{display:flex;gap:8px;margin-bottom:10px;}
@@ -187,7 +195,8 @@ select:focus{outline:none;border-color:var(--accent);}
   .confetti{display:none;}
   .rm .node.active .dot .pulse{animation:none;}
   .box svg path{transition:none;stroke-dashoffset:0;}
-  .view,.link{animation:none;}
+  .view,.link,.nextday{animation:none;}
+  .nextday-arrow{transition:none;}
   .item.pressing,.figrow button.pressing{animation:none;}
   .switch-thumb{transition:none;}
   .combo,.combo-num{animation:none;}
