@@ -192,6 +192,12 @@ export default function App() {
         <div className="count">
           {total === 0 ? 'No tasks' : allDone ? 'All done' : <><b>{doneCount}</b> of {total} done</>}
         </div>
+        {allDone && (
+          <button className="nextday-btn" onClick={() => goToDate(nextDate)}
+            title={nextDate ? 'Go to the next day' : 'Check for the next day'}>
+            Next day <span className="nextday-arrow" aria-hidden="true">→</span>
+          </button>
+        )}
       </div>
 
       {day.carryover && day.carryover.length > 0 && (
@@ -207,15 +213,6 @@ export default function App() {
           ? day.today_tasks.map(t => <Item key={t.id} listName="today" task={t} done={isDone(snap, { list: 'today', id: t.id })} readonly={ro} onToggle={onToggle} />)
           : <div className="empty">Nothing was scheduled this day.</div>}
       </div>
-
-      {allDone && (
-        <div className="nextday">
-          <button className="nextday-btn" onClick={() => goToDate(nextDate)}
-            title={nextDate ? 'Go to the next day' : 'Check for the next day'}>
-            Next day <span className="nextday-arrow" aria-hidden="true">→</span>
-          </button>
-        </div>
-      )}
 
       <div className="notes">
         <h2>Figma links &amp; notes</h2>
