@@ -19,8 +19,16 @@ const Check = () => (
 )
 
 function Item({ task, listName, done, readonly, onToggle }) {
+  // Click-driven press pulse: a full scale-down-and-back keyframe plays on every click,
+  // so the feedback is consistent regardless of how briefly the pointer is held.
+  const [pressing, setPressing] = useState(false)
+  const press = () => { setPressing(true); onToggle(listName, task.id, !done) }
   return (
-    <div className={'item' + (done ? ' done' : '')} onClick={readonly ? undefined : () => onToggle(listName, task.id, !done)}>
+    <div
+      className={'item' + (done ? ' done' : '') + (pressing ? ' pressing' : '')}
+      onClick={readonly ? undefined : press}
+      onAnimationEnd={e => { if (e.animationName === 'item-press') setPressing(false) }}
+    >
       <div className="box"><Check /></div>
       <div className="txt">
         <div className="t">{task.title}</div>
@@ -39,9 +47,11 @@ export default function App() {
   const [savedFlash, setSavedFlash] = useState(false)
   const [confettiKey, setConfettiKey] = useState(0)
   const [removing, setRemoving] = useState(() => new Set())
+  const [addPressing, setAddPressing] = useState(false)
   const [streak, setStreak] = useState(() => computeStreak(loadCompletedDays()))
   const [streakPulse, setStreakPulse] = useState(0)
   const streakRef = useRef(streak)
+  const linkRefs = useRef({})
 
   // Navigate to a day: show the cached copy instantly, then refresh from Drive. If the
   // network (or the dev server, which has no /api) fails, fall back to a local seed.
@@ -123,10 +133,24 @@ export default function App() {
     if (ro || removing.has(url)) return
     setRemoving(prev => new Set(prev).add(url))
     api.removeLink(date, url).catch(() => {})
+    // Smoothly collapse the row's measured height to 0 (no max-height dead-time, no grid floor),
+    // then drop it from state once it has closed up.
+    const el = linkRefs.current[url]
+    const reduce = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (el && !reduce) {
+      const ease = 'cubic-bezier(.4,0,1,1)' // ease-in for the exit
+      el.style.height = el.offsetHeight + 'px'
+      void el.offsetHeight // reflow so the height has a start value to animate from
+      el.style.transition = `height .24s ${ease}, opacity .18s ${ease}, margin-bottom .24s ${ease}, transform .24s ${ease}`
+      el.style.height = '0px'
+      el.style.opacity = '0'
+      el.style.marginBottom = '0px'
+      el.style.transform = 'translateX(12px)'
+    }
     window.setTimeout(() => {
       setSnap(cur => { const next = { ...cur, links: cur.links.filter(u => u !== url) }; cacheSnap(next); return next })
       setRemoving(prev => { const n = new Set(prev); n.delete(url); return n })
-    }, 200)
+    }, reduce ? 0 : 260)
   }
 
   const onNotes = (e) => {
@@ -186,13 +210,15 @@ export default function App() {
         {!ro && (
           <div className="figrow">
             <input value={figInput} onChange={e => setFigInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && addLink()} placeholder="Paste a Figma URL…" />
-            <button onClick={addLink}>Add</button>
+            <button className={addPressing ? 'pressing' : ''} onClick={() => { setAddPressing(true); addLink() }}
+              onAnimationEnd={e => { if (e.animationName === 'btn-press') setAddPressing(false) }}>Add</button>
           </div>
         )}
         <div className="links">
           {snap.links.length === 0 && ro && <div className="links-empty">No links submitted this day.</div>}
           {snap.links.map((u) => (
-            <div className={'link' + (removing.has(u) ? ' removing' : '')} key={u}>
+            <div className={'link' + (removing.has(u) ? ' removing' : '')} key={u}
+              ref={el => { if (el) linkRefs.current[u] = el; else delete linkRefs.current[u] }}>
               <span className="fig">{/figma\.com/i.test(u) ? 'FIGMA' : 'LINK'}</span>
               <a href={u} target="_blank" rel="noopener noreferrer">{u}</a>
               {!ro && <span className="x" title="Remove" onClick={() => removeLink(u)}>×</span>}

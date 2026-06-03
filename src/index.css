@@ -61,9 +61,10 @@ select:focus{outline:none;border-color:var(--accent);}
 .section h2{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);font-weight:600;margin:12px 8px 4px;display:flex;align-items:center;gap:8px;}
 .section h2 .pill{font-size:10px;font-weight:600;padding:1px 7px;border-radius:999px;}
 .pill.carry{color:var(--risk);background:var(--risk-soft);}
-.item{display:flex;gap:12px;padding:12px 8px;border-radius:var(--r-sm);cursor:pointer;transition:background .15s,transform .14s var(--ease);align-items:flex-start;}
+.item{display:flex;gap:12px;padding:12px 8px;border-radius:var(--r-sm);cursor:pointer;transition:background .15s;align-items:flex-start;}
 .item:hover{background:var(--raised);}
-.card:not(.ro) .item:active{transform:scale(.98);transition-duration:.06s;}
+.item.pressing{animation:item-press .19s var(--ease);}
+@keyframes item-press{0%{transform:scale(1);}40%{transform:scale(.955);}100%{transform:scale(1);}}
 .ro .item{cursor:default;}
 .ro .item:hover{background:transparent;}
 .box{flex:none;width:20px;height:20px;border:1.5px solid var(--border-strong);border-radius:6px;margin-top:1px;display:grid;place-items:center;transition:background .18s var(--ease),border-color .18s var(--ease);background:var(--surface);}
@@ -86,15 +87,16 @@ select:focus{outline:none;border-color:var(--accent);}
 .figrow input{flex:1;min-width:0;font-family:var(--f);font-size:13px;font-weight:450;color:var(--text-1);border:1px solid var(--border-strong);border-radius:var(--r-sm);padding:9px 11px;background:var(--surface);}
 .figrow input::placeholder{color:var(--text-3);}
 .figrow input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
-.figrow button{flex:none;font-family:var(--f);font-size:13px;font-weight:550;color:#fff;background:var(--accent);border:none;border-radius:var(--r-sm);padding:0 14px;cursor:pointer;transition:opacity .15s,transform .16s var(--ease);}
+.figrow button{flex:none;font-family:var(--f);font-size:13px;font-weight:550;color:#fff;background:var(--accent);border:none;border-radius:var(--r-sm);padding:0 14px;cursor:pointer;transition:opacity .15s;}
 .figrow button:hover{opacity:.9;}
-.figrow button:active{transform:scale(.9);transition-duration:.06s;}
+.figrow button.pressing{animation:btn-press .19s var(--ease);}
+@keyframes btn-press{0%{transform:scale(1);}40%{transform:scale(.92);}100%{transform:scale(1);}}
 .links{display:flex;flex-direction:column;}
-.link{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 10px;font-size:13px;margin-bottom:6px;overflow:hidden;animation:link-in .22s var(--ease) both;}
+/* removal collapses the measured height to 0 via inline styles in removeLink() — smooth at any height */
+.link{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 10px;font-size:13px;margin-bottom:6px;overflow:hidden;animation:link-in .22s var(--ease) backwards;}
 .link:last-child{margin-bottom:0;}
-.link.removing{animation:link-out .2s cubic-bezier(.4,0,1,1) forwards;pointer-events:none;}
+.link.removing{pointer-events:none;}
 @keyframes link-in{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
-@keyframes link-out{from{opacity:1;max-height:46px;transform:translateX(0);}to{opacity:0;max-height:0;margin-bottom:0;padding-top:0;padding-bottom:0;border-width:0;transform:translateX(8px);}}
 .link a{color:var(--accent);text-decoration:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .link a:hover{text-decoration:underline;}
 .link .fig{flex:none;font-size:11px;font-weight:600;color:var(--text-3);}
@@ -185,7 +187,8 @@ select:focus{outline:none;border-color:var(--accent);}
   .confetti{display:none;}
   .rm .node.active .dot .pulse{animation:none;}
   .box svg path{transition:none;stroke-dashoffset:0;}
-  .view,.link,.link.removing{animation:none;}
+  .view,.link{animation:none;}
+  .item.pressing,.figrow button.pressing{animation:none;}
   .switch-thumb{transition:none;}
   .combo,.combo-num{animation:none;}
   .g-needle,.g-val{transition:none;animation:none;}
