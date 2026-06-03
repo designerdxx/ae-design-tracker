@@ -37,11 +37,15 @@ export function buildState({ meta = [], roadmap = [], tasks = [], links = [], no
       progress: r.fields.Progress || 0,
     }))
 
-  // Dates from Tasks; chosen date = requested (if valid) else latest
+  // Distinct Task dates, sorted ascending (ISO strings sort chronologically). The "current"
+  // day is ALWAYS the maximum Date present in the data — never the device clock — so a
+  // scheduled job can post a day ahead of the calendar and the site shows it. When no date
+  // is requested, default to that latest (max) day; all earlier days are available read-only.
   const dates = Array.from(new Set(tasks.map(r => r.fields.Date).filter(Boolean))).sort()
   const date = requestedDate && dates.includes(requestedDate) ? requestedDate : (dates[dates.length - 1] || null)
 
   const dayTasks = date ? tasks.filter(r => r.fields.Date === date) : []
+  // Map only the contract fields onto each task (FigmaPrompt is intentionally never surfaced).
   const toTask = r => ({ id: r.fields.TaskId, title: r.fields.Title, done_definition: r.fields.DoneDefinition })
   const today_tasks = dayTasks.filter(r => r.fields.List === 'today').map(toTask).sort(byTaskId)
   const carryover = dayTasks.filter(r => r.fields.List === 'carry').map(toTask).sort(byTaskId)

@@ -34,7 +34,9 @@ async function call(method, path, body) {
 }
 
 // Every record (follows pagination). Returns [{ id, fields }].
-export async function listAll(table, { filterByFormula, sort } = {}) {
+// `fields` restricts which columns Airtable returns — pass it to fetch ONLY the contract
+// fields (e.g. so the Tasks table's FigmaPrompt column is never fetched or exposed).
+export async function listAll(table, { filterByFormula, sort, fields } = {}) {
   const out = []
   let offset
   do {
@@ -46,6 +48,7 @@ export async function listAll(table, { filterByFormula, sort } = {}) {
       p.set(`sort[${i}][field]`, s.field)
       p.set(`sort[${i}][direction]`, s.direction || 'asc')
     })
+    if (fields) fields.forEach(f => p.append('fields[]', f))
     const data = await call('GET', `${encodeURIComponent(table)}?${p.toString()}`)
     out.push(...(data.records || []))
     offset = data.offset
@@ -62,8 +65,8 @@ export function patchRecord(table, recordId, fields) {
 export function deleteRecord(table, recordId) {
   return call('DELETE', `${encodeURIComponent(table)}/${recordId}`)
 }
-export async function findOne(table, filterByFormula) {
-  const recs = await listAll(table, { filterByFormula })
+export async function findOne(table, filterByFormula, fields) {
+  const recs = await listAll(table, { filterByFormula, fields })
   return recs[0] || null
 }
 

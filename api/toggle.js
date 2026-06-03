@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     const { date, id, list, done } = await readBody(req)
     if (!date || !id || !list) return sendJson(res, 400, { error: 'bad_request' })
 
-    const rec = await findOne('Tasks', eq('Key', `${date}|${list}-${id}`))
+    const rec = await findOne('Tasks', eq('Key', `${date}|${list}-${id}`), ['Key'])
     if (rec) await patchRecord('Tasks', rec.id, { Done: !!done })
     sendJson(res, 200, { ok: true, found: !!rec })
   } catch (err) {
