@@ -1,23 +1,26 @@
 // GET /api/state?date=YYYY-MM-DD
-// Downloads feed.json + state.json, merges them, returns the view model for one day.
-// If `date` is omitted, the latest day in feed.days is used. Reads happen at request
-// time, so a new Cowork brief shows up with no redeploy.
+// Reads the six Airtable tables and merges them into the view model the UI consumes.
+// If `date` is omitted, the latest day in Tasks is used. Reads at request time, so new
+// Cowork updates appear with no redeploy.
 
-import { readJson, FEED_FILE, STATE_FILE, missingEnv, sendJson } from './_drive.js'
-import { mergeState } from './_merge.js'
+import { listAll, missingEnv, sendJson } from './_airtable.js'
+import { buildState } from './_shape.js'
 
 export default async function handler(req, res) {
   const missing = missingEnv()
   if (missing.length) return sendJson(res, 500, { error: 'missing_env', missing })
 
   try {
-    const [feed, state] = await Promise.all([
-      readJson(FEED_FILE, { meta: {}, days: {}, roadmap: [], backlog: [] }),
-      readJson(STATE_FILE, { done: {}, links: {}, notes: {}, view: 'daily' }),
+    const [meta, roadmap, tasks, links, notes] = await Promise.all([
+      listAll('Meta'),
+      listAll('Roadmap', { sort: [{ field: 'Order' }] }),
+      listAll('Tasks'),
+      listAll('Links'),
+      listAll('Notes'),
     ])
     const requested = (req.query && req.query.date) || null
-    sendJson(res, 200, mergeState(feed, state, requested))
+    sendJson(res, 200, buildState({ meta, roadmap, tasks, links, notes }, requested))
   } catch (err) {
-    sendJson(res, 502, { error: 'drive_read_failed', message: String((err && err.message) || err) })
+    sendJson(res, 502, { error: 'airtable_read_failed', message: String((err && err.message) || err) })
   }
 }
