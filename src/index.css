@@ -10,7 +10,7 @@
   --progress-track:#3A3833;
   --r:12px; --r-sm:8px;
   --ease:cubic-bezier(.22,1,.36,1); /* ease-out-quint */
-  --f: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --f: "Sora", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 *{box-sizing:border-box;}
 html,body{margin:0;background:var(--bg);font-family:var(--f);color:var(--text-1);-webkit-font-smoothing:antialiased;font-weight:450;}
@@ -100,7 +100,7 @@ select:focus{outline:none;border-color:var(--accent);}
 .link .x{flex:none;cursor:pointer;color:var(--text-3);font-size:15px;line-height:1;padding:2px 4px;border-radius:4px;}
 .link .x:hover{background:var(--risk-soft);color:var(--risk);}
 .links-empty{font-size:12px;color:var(--text-3);padding:2px 2px 0;}
-.notepad{width:100%;font-family:var(--f);font-size:13px;font-weight:450;color:var(--text-1);line-height:1.5;border:1px solid var(--border-strong);border-radius:var(--r-sm);padding:10px 11px;background:var(--surface);resize:vertical;min-height:60px;margin-top:10px;}
+.notepad{width:100%;font-family:var(--f);font-size:13px;font-weight:450;color:var(--text-1);line-height:1.5;border:1px solid var(--border-strong);border-radius:var(--r-sm);padding:10px 11px;background:var(--surface);resize:vertical;min-height:60px;margin-top:0;}
 .notepad:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
 .notepad[readonly]{color:var(--text-2);background:var(--raised);cursor:default;}
 .notelabel{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);font-weight:600;margin:16px 0 8px;}
@@ -156,18 +156,6 @@ select:focus{outline:none;border-color:var(--accent);}
   8%{opacity:1;}
   100%{opacity:0;transform:translate(var(--drift),105vh) rotate(var(--rot));}
 }
-/* ===== "Day cleared → Next day" advance band ===== */
-.advance{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 20px;border-top:1px solid var(--border);background:var(--raised);animation:advance-in .3s var(--ease) both;}
-.advance-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--done);}
-.advance-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--done);}
-.advance-btn{font-family:var(--f);font-size:13px;font-weight:600;color:#fff;background:var(--accent);border:none;border-radius:var(--r-sm);padding:8px 13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:opacity .15s,transform .12s var(--ease);}
-.advance-btn:hover{opacity:.92;}
-.advance-btn:active{transform:scale(.97);}
-.advance-arrow{transition:transform .2s var(--ease);}
-.advance-btn:hover .advance-arrow{transform:translateX(3px);}
-.advance-caught{font-size:12px;color:var(--text-3);}
-@keyframes advance-in{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
-
 /* ===== Combo meter — a streak speedometer (no panel, sits bare in the corner) ===== */
 /* Tier colour climbs green → red with the streak. */
 .combo{position:fixed;z-index:40;right:max(16px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:0;--c:var(--done);pointer-events:none;animation:combo-in .55s cubic-bezier(.2,1.25,.3,1) both;}
@@ -198,8 +186,6 @@ select:focus{outline:none;border-color:var(--accent);}
   .box svg path{transition:none;stroke-dashoffset:0;}
   .view,.link,.link.removing{animation:none;}
   .switch-thumb{transition:none;}
-  .advance{animation:none;}
-  .advance-arrow{transition:none;}
   .combo,.combo-num{animation:none;}
   .g-needle,.g-val{transition:none;animation:none;}
 }

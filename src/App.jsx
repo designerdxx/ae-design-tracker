@@ -181,15 +181,6 @@ export default function App() {
           : <div className="empty">Nothing was scheduled this day.</div>}
       </div>
 
-      {allDone && (
-        <div className="advance">
-          <span className="advance-tag">Day cleared</span>
-          {idx < dates.length - 1
-            ? <button className="advance-btn" onClick={() => goToDate(dates[idx + 1])}>Next day <span className="advance-arrow">→</span></button>
-            : <span className="advance-caught">All caught up — next brief drops soon</span>}
-        </div>
-      )}
-
       <div className="notes">
         <h2>Figma links &amp; notes</h2>
         {!ro && (
