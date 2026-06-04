@@ -24,14 +24,25 @@ export const viewStore = {
 const COMPLETED_DAYS = 'askedgar:streak:days'
 export function loadCompletedDays() { return ls.get(COMPLETED_DAYS, {}) }
 export function saveCompletedDays(set) { ls.set(COMPLETED_DAYS, set) }
-const toUTC = d => { const [y, m, day] = d.split('-').map(Number); return Date.UTC(y, m - 1, day) }
+// Previous working day (skipping Sat/Sun) for an ISO date string, in UTC.
+const prevWorkingDay = d => {
+  const [y, m, day] = d.split('-').map(Number)
+  let t = Date.UTC(y, m - 1, day)
+  do { t -= 86400000 } while ([0, 6].includes(new Date(t).getUTCDay())) // 0=Sun, 6=Sat
+  const nd = new Date(t)
+  const p = n => String(n).padStart(2, '0')
+  return `${nd.getUTCFullYear()}-${p(nd.getUTCMonth() + 1)}-${p(nd.getUTCDate())}`
+}
+// The streak is a run of consecutive WORKING days. Two completed days count as adjacent
+// when the lower one is the other's previous working day — so Fri→Mon carries over (the
+// weekend is skipped). The streak only resets when a working day was missed (left undone).
 export function computeStreak(set) {
   const days = Object.keys(set || {}).filter(d => set[d]).sort()
   if (!days.length) return 0
   let streak = 1
   let cur = days[days.length - 1]
   for (let i = days.length - 2; i >= 0; i--) {
-    if (Math.round((toUTC(cur) - toUTC(days[i])) / 86400000) === 1) { streak++; cur = days[i] } else break
+    if (days[i] === prevWorkingDay(cur)) { streak++; cur = days[i] } else break
   }
   return streak
 }
